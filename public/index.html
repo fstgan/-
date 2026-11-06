@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مين الدخيل؟</title>
+<style>
+:root{--bg:#f3f0ff;--c:#fff;--t:#1a1640;--m:#6b6a8f;--a:#ff9f1c;--b:#6c4cf5;--r:#e5384f;--g:#12a594;--ln:#e2ddf7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1226;--c:#1b1f3d;--t:#f4f1ff;--m:#9aa0c9;--ln:#2d3263}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--t);font-family:"Tajawal","Segoe UI",Tahoma,sans-serif}
+#app{max-width:520px;margin:0 auto;padding:16px 16px 90px}
+.logo{text-align:center;font-size:34px;font-weight:800;margin:8px 0 2px;background:linear-gradient(90deg,var(--b),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{text-align:center;color:var(--m);margin:0 0 14px}
+.card{background:var(--c);border:1px solid var(--ln);border-radius:20px;padding:16px;margin:12px 0;animation:pop .3s}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+h2{margin:0 0 10px;font-size:20px}h3{margin:14px 0 4px;font-size:15px;color:var(--m)}.m{color:var(--m)}
+button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:13px 16px;background:var(--ln);color:var(--t);cursor:pointer;width:100%;margin:5px 0}
+button.p{background:var(--b);color:#fff}button.s{background:var(--a);color:#2b1a00}button:disabled{opacity:.45}
+button.tg{width:auto;padding:8px 12px;margin:3px;font-size:14px}button.tg.on{background:var(--b);color:#fff}
+input{font:inherit;width:100%;padding:13px;border-radius:14px;border:2px solid var(--ln);background:var(--bg);color:var(--t)}
+.row{display:flex;gap:8px}.row button{width:auto;margin:0;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{padding:6px 12px;border-radius:99px;color:#1a1640;font-weight:700;animation:pop .3s}
+.code{font-size:30px;letter-spacing:6px;background:var(--bg);padding:2px 14px;border-radius:12px;direction:ltr;display:inline-block}
+.word{background:linear-gradient(135deg,var(--b),#a05cff);color:#fff;border-radius:16px;padding:18px;text-align:center;font-size:26px;font-weight:800;cursor:pointer;user-select:none}
+.word.imp{background:linear-gradient(135deg,#c2255c,#e5384f)}.word small{display:block;font-size:15px;font-weight:700;margin-top:6px;opacity:.95}
+.cat{display:inline-block;background:var(--bg);padding:3px 12px;border-radius:99px;font-size:14px;font-weight:700;margin-bottom:8px}
+.bub{display:flex;gap:8px;align-items:center;margin:6px 0}.bub i{font-style:normal;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:700;color:#1a1640}.bub span{background:var(--bg);padding:6px 14px;border-radius:14px;font-weight:700}
+.turn{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin:10px 0}.tm{color:var(--r);font-size:22px}
+.pips{letter-spacing:4px;color:var(--b);font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bar{height:10px;border-radius:9px;background:var(--b);transition:width .6s}
+.big{font-size:24px;font-weight:800;text-align:center;margin:6px 0}.win{color:var(--g)}.lose{color:var(--r)}
+.sc{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--ln)}
+details{margin-top:8px;color:var(--m)}summary{cursor:pointer;text-align:center}
+.rx{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:0;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));background:var(--c);border-top:1px solid var(--ln);z-index:5}
+.rx button{width:auto;margin:0;padding:6px 5px;font-size:20px;background:transparent}
+.fl{position:fixed;bottom:70px;font-size:38px;pointer-events:none;animation:fl 2.2s ease-out forwards;text-align:center;z-index:9}.fl small{display:block;font-size:12px;color:var(--m)}
+@keyframes fl{to{transform:translateY(-55vh) scale(1.3);opacity:0}}
+#mu{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:8px;width:auto;padding:6px 10px;margin:0;background:transparent;font-size:20px;z-index:6}
+</style></head><body><button id="mu">🔊</button><div id="app"></div><div id="rxb" class="rx" style="display:none">
+<button>😂</button><button>🤔</button><button>😱</button><button>👀</button><button>🔥</button><button>👏</button><button>🤫</button><button>😎</button></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let ws=null,S=null,err='',ID='',inRoom=false,lastJoin=null,snd=true,ac=null,lastKey='';
+try{ID=localStorage.getItem('imp_id')||''}catch(e){}
+if(!ID){ID=Math.random().toString(36).slice(2)+Date.now().toString(36);try{localStorage.setItem('imp_id',ID)}catch(e){}}
+let savedName='';try{savedName=localStorage.getItem('imp_n')||''}catch(e){}
+const pBy=id=>S.pl.find(p=>p.id==id)||{n:'؟',c:'#ccc'};
+const chip=p=>`<span class="chip" style="background:${p.c}">${esc(p.n)}${S&&S.host==p.id?' 👑':''}</span>`;
+const hd=()=>`<div class="logo">🕵️ مين الدخيل؟</div><p class="sub">غرفة <b>${S.code}</b>${S.gm?` • اللعبة ${S.gm}`:''}</p>`;
+const act=(a,d={})=>ws&&ws.readyState==1&&ws.send(JSON.stringify({t:'act',a,...d}));
+function beep(f=660,d=.12){if(!snd)return;try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;ac=ac||new A();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+$('#mu').onclick=()=>{snd=!snd;$('#mu').textContent=snd?'🔊':'🔇'};
+document.querySelectorAll('#rxb button').forEach(b=>b.onclick=()=>ws&&ws.readyState==1&&ws.send(JSON.stringify({t:'rx',e:b.textContent})));
+function float(e,n){const d=document.createElement('div');d.className='fl';d.style.left=(10+Math.random()*75)+'%';d.innerHTML=e+'<small>'+esc(n)+'</small>';document.body.appendChild(d);setTimeout(()=>d.remove(),2300)}
+function connect(first){
+  const proto=location.protocol=='https:'?'wss':'ws';
+  ws=new WebSocket(proto+'://'+location.host);
+  ws.onopen=()=>{if(first)ws.send(JSON.stringify(first));else if(lastJoin)ws.send(JSON.stringify(lastJoin))};
+  ws.onmessage=e=>{const m=JSON.parse(e.data);
+    if(m.t=='st'){S=m.S;inRoom=true;err='';lastJoin={t:'join',code:S.code,id:ID,n:lastJoin&&lastJoin.n||''};render()}
+    else if(m.t=='rx')float(m.e,m.n);
+    else if(m.t=='err'){err=m.m;inRoom=false;S=null;lastJoin=null;render()}};
+  ws.onclose=()=>{if(lastJoin)setTimeout(()=>connect(),1500)};
+}
+const clist=()=>[1,2,3].filter(r=>S.cl.some(c=>c.r==r)).map(r=>`<div class="m">الجولة ${r}</div>`+S.cl.filter(c=>c.r==r).map(c=>`<div class="bub"><i style="background:${pBy(c.id).c}">${esc(pBy(c.id).n)}</i><span>${esc(c.x)}</span></div>`).join('')).join('');
+const pips=()=>`<span class="pips">${[1,2,3].map(i=>i<=S.rd?'●':'○').join(' ')}</span>`;
+function share(){const t=`تعال نلعب مين الدخيل 🕵️\nالرابط: ${location.origin}\nرمز الغرفة: ${S.code}`;if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard){navigator.clipboard.writeText(t);$('#sh').textContent='تم النسخ ✅'}}
+const V={
+lobby(){
+  const hv=S.host==S.me,o=S.opts;
+  const cb=c=>`<button class="tg ${o.cats.includes(c.k)?'on':''}" ${hv?`data-c="${c.k}"`:'disabled'}>${c.e} ${c.n}</button>`;
+  app.innerHTML=hd()+`<div class="card"><h2>اللاعبون (${S.pl.length}/10)</h2><div class="chips">${S.pl.map(p=>chip(p)+(hv&&p.id!=S.me?`<button class="tg" data-k="${esc(p.id)}">✖</button>`:'')).join('')}</div>
+  <p class="m">رمز الغرفة <span class="code">${S.code}</span></p><button class="s" id="sh">📤 شارك الدعوة</button><p class="m">يبدأ اللعب من 3 لاعبين.</p></div>
+  <div class="card"><h2>إعدادات اللعبة ${hv?'':'<small class="m">(المضيف يتحكم)</small>'}</h2>
+  <h3>الفئات (${o.cats.length})</h3><div>${S.catlist.map(cb).join('')}</div>
+  <h3>وقت التلميحة</h3><div>${[20,30,45,60].map(t=>`<button class="tg ${o.timer==t?'on':''}" ${hv?`data-t="${t}"`:'disabled'}>${t} ثانية</button>`).join('')}</div>
+  <h3>خيارات</h3><button class="tg ${o.knows?'on':''}" id="kn" ${hv?'':'disabled'}>🕵️ الدخيل يعرف نفسه: ${o.knows?'نعم':'لا'}</button>
+  <button class="tg ${o.guess?'on':''}" id="gs" ${hv?'':'disabled'}>🎯 فرصة تخمين للدخيل: ${o.guess?'نعم':'لا'}</button></div>
+  <div class="card">`+(hv?`<button class="p" id="go" ${S.pl.length<3?'disabled':''}>ابدأ اللعب 🎮</button>`:`<p class="m">بانتظار المضيف…</p>`)+`<p class="lose">${err}</p></div>`;
+  $('#sh').onclick=share;
+  if(hv){const set=x=>act('opts',{...o,...x});
+    document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c,c=o.cats.includes(k)?o.cats.filter(x=>x!=k):[...o.cats,k];if(c.length)set({cats:c})});
+    document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>set({timer:+b.dataset.t}));
+    document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>act('kick',{id:b.dataset.k}));
+    $('#kn').onclick=()=>set({knows:!o.knows});$('#gs').onclick=()=>set({guess:!o.guess});$('#go').onclick=()=>act('start')}
+},
+clues(){
+  const cur=S.ord[S.t],p=pBy(cur),mine=S.me==cur,key=S.gm+'-'+S.rd+'-'+S.t;
+  if(mine&&lastKey!=key){beep(880,.15);vib(200)}lastKey=key;
+  app.innerHTML=hd()+`<div class="card"><span class="cat">${esc(S.cat)}</span> ${pips()}<div class="word${S.isImp?' imp':''}" id="wd">👁 اضغط لإظهار كلمتك</div><div class="turn"><span>الدور على: ${chip(p)}</span><span class="tm" id="tm"></span></div>${clist()}`+
+  (mine?`<div class="row"><input id="cx" maxlength="16" placeholder="تلميحة بكلمة وحدة"><button class="p" id="sd">أرسل</button></div><p class="lose" id="er"></p>`:`<p class="m">انتظر تلميحة ${esc(p.n)}…</p>`)+`</div>`;
+  let sh=false;$('#wd').onclick=()=>{sh=!sh;const w=$('#wd');w.innerHTML=sh?esc(S.w)+(S.isImp?'<small>🕵️ أنت الدخيل! حاول ما يكشفونك!</small>':''):'👁 اضغط لإظهار كلمتك'};
+  if(mine){const go=()=>{const x=$('#cx').value.trim();if(!x)return;if(x==S.w){$('#er').textContent='ما يصير تكتب الكلمة نفسها 😅';return}act('clue',{x})};$('#sd').onclick=go;$('#cx').onkeydown=e=>{if(e.key=='Enter')go()};$('#cx').focus()}
+},
+mid(){
+  const hv=S.host==S.me,my=S.mymv;
+  app.innerHTML=hd()+`<div class="card"><h2>خلصت الجولة ${S.rd} من 3 ${pips()}</h2>${clist()}<p class="m">ناقشوا بصوتكم: مين تلميحته غريبة؟ ثم اختر:</p>
+  <button class="${my=='more'?'p':'s'}" id="mo">➕ نكمل جولة ثانية (${S.mc.more})</button><button class="${my=='vote'?'p':''}" id="tv">🗳️ نبدأ التصويت (${S.mc.vote})</button>
+  <p class="m">القرار بالأغلبية، وإذا تساوت نكمل.</p>`+(hv?`<button id="dc">حسم الآن ⏩</button>`:'')+`</div>`;
+  $('#mo').onclick=()=>act('choose',{c:'more'});$('#tv').onclick=()=>act('choose',{c:'vote'});if(hv)$('#dc').onclick=()=>act('decide');
+},
+vote(){
+  const done=S.vt[S.me];
+  app.innerHTML=hd()+`<div class="card"><h2>مين الدخيل؟ 🕵️</h2>${clist()}`+(done?`<p class="big">صوّتّ ✅</p><p class="m">بانتظار الباقين (${Object.keys(S.vt).length}/${S.pl.length})</p>`:`<div class="grid">${S.pl.filter(p=>p.id!=S.me).map(p=>`<button data-i="${esc(p.id)}" style="background:${p.c};color:#1a1640">${esc(p.n)}</button>`).join('')}</div>`)+`</div>`;
+  document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>act('vote',{to:b.dataset.i}));
+},
+guess(){
+  const imp=pBy(S.res.out);
+  app.innerHTML=hd()+`<div class="card"><div class="big lose">😱 انكشف الدخيل!</div><p class="big">${chip(imp)}</p>`+
+  (S.isImp?`<p class="m" style="text-align:center">عندك فرصة أخيرة! خمّن كلمة المجموعة وتسرق الفوز 🎯</p><div class="row"><input id="gx" maxlength="20" placeholder="كلمة المجموعة"><button class="p" id="gb">خمّن</button></div>`:`<p class="m" style="text-align:center">ننتظر ${esc(imp.n)} يخمّن كلمة المجموعة… 🤞</p>`)+`<div class="big tm" id="tm"></div></div>`;
+  if(S.isImp){const go=()=>act('guess',{x:$('#gx').value});$('#gb').onclick=go;$('#gx').onkeydown=e=>{if(e.key=='Enter')go()};$('#gx').focus()}
+},
+res(){
+  const r=S.res,imp=pBy(S.imp),mx=Math.max(1,...Object.values(r.cnt)),hv=S.host==S.me,gone=r.caught&&!r.stolen;
+  if(lastKey!='res'+S.gm){lastKey='res'+S.gm;beep(gone?880:330,.3);vib([100,60,100])}
+  app.innerHTML=hd()+`<div class="card"><div class="big ${gone?'win':'lose'}">${gone?'🎉 انكشف الدخيل!':r.stolen?'😈 الدخيل خمّن الكلمة وسرق الفوز!':'😈 الدخيل نجا!'}</div>
+  <p class="big">${chip(imp)}</p><p class="m" style="text-align:center">كلمة الجميع <b>${esc(S.wa)}</b> — كلمة الدخيل <b>${esc(S.wb)}</b></p>${r.caught&&r.guess?`<p class="m" style="text-align:center">تخمين الدخيل: <b>${esc(r.guess)}</b></p>`:''}
+  ${S.pl.map(p=>`<div class="bub"><i style="background:${p.c}">${esc(p.n)}</i><div style="flex:1"><div class="bar" style="width:${(r.cnt[p.id]||0)/mx*100}%"></div></div><b>${r.cnt[p.id]||0}</b></div>`).join('')}
+  </div><div class="card"><h2>النقاط 🏆</h2>${[...S.pl].sort((a,b)=>b.s-a.s).map(p=>`<div class="sc"><span>${chip(p)}</span><b>${p.s}</b></div>`).join('')}`+(hv?`<button class="p" id="ag">جولة جديدة 🔁</button><button id="lb">تعديل الإعدادات ⚙️</button>`:`<p class="m">بانتظار المضيف…</p>`)+`</div>`;
+  if(hv){$('#ag').onclick=()=>act('again');$('#lb').onclick=()=>act('lobby')}
+}};
+function render(){
+  if(!inRoom||!S){$('#rxb').style.display='none';return home()}
+  $('#rxb').style.display=['clues','mid','vote','guess'].includes(S.ph)?'flex':'none';V[S.ph]()
+}
+function home(){
+  app.innerHTML=`<div class="logo">🕵️ مين الدخيل؟</div><p class="sub">لعبة تخمين الكلمات والتلميحات</p><div class="card">
+  <input id="nm" maxlength="12" placeholder="اسمك" value="${esc(savedName)}"><button class="p" id="cr" style="margin-top:10px">أنشئ غرفة جديدة</button>
+  <p class="m" style="text-align:center">أو ادخل بالرمز</p><div class="row"><input id="cd" inputmode="numeric" maxlength="4" placeholder="رمز الغرفة"><button class="s" id="jn">دخول</button></div><p class="lose" id="er">${err}</p>
+  <details open><summary>كيف تلعب؟</summary><p>كل لاعب ياخذ كلمة سرية، والكل نفس الكلمة إلا واحد (الدخيل) كلمته مختلفة. كل واحد يعطي تلميحة بكلمة وحدة عن كلمته بدون ما يذكرها (3 جولات بحد أقصى، وبعد كل جولة تختارون نكمل أو نصوّت). في الآخر تصوّتون مين الدخيل. انكشف؟ نقطة لكل من صوّت صح، لكن الدخيل عنده فرصة يخمّن الكلمة ويسرق الفوز! نجا؟ ياخذ نقطتين.</p></details></div>`;
+  const go=t=>{const n=$('#nm').value.trim(),c=$('#cd').value.trim();if(!n){$('#er').textContent='اكتب اسمك';return}
+    if(t=='join'&&!/^\d{4}$/.test(c)){$('#er').textContent='الرمز 4 أرقام';return}
+    try{localStorage.setItem('imp_n',n)}catch(e){}savedName=n;
+    const msg={t,code:c,id:ID,n};lastJoin={t:'join',code:c,id:ID,n};if(ws)try{ws.onclose=null;ws.close()}catch(e){}connect(msg)};
+  $('#cr').onclick=()=>go('create');$('#jn').onclick=()=>go('join');
+}
+setInterval(()=>{const t=$('#tm');if(t&&S&&S.dl)t.textContent=Math.max(0,Math.ceil((S.dl-Date.now())/1000))},300);
+render();
+</script></body></html>
